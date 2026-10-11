@@ -1,0 +1,225 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-lexend);
+}
+
+@theme {
+  /* Brand (logo) */
+  --color-brand: #0057d9;
+  --color-brand-light: #2a85ff;
+
+  /* Medical teal (primary actions). Dark enough for white text to stay
+     readable (WCAG AA contrast). */
+  --color-medical: #0f766e;
+  --color-medical-light: #0d9488;
+  --color-medical-dark: #115e59;
+
+  --animate-fade-up: fade-up 0.5s ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* Tailwind v4 resets buttons to the default cursor; restore the pointer */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/*
+ * Reusable component classes. They live in the `components` layer, so a
+ * Tailwind utility on the same element (e.g. `card p-6`) still wins.
+ */
+@layer components {
+  /* Full-page soft background, e.g. for login / auth pages */
+  .page-soft {
+    @apply min-h-full bg-linear-to-br from-teal-50 via-white to-sky-50;
+  }
+
+  /* White rounded panel with a soft shadow */
+  .card {
+    @apply rounded-3xl border border-slate-100 bg-white/90 p-8 shadow-xl shadow-slate-200/60 backdrop-blur sm:p-12;
+  }
+
+  /* Text input */
+  .field {
+    @apply w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-base text-slate-900 transition duration-200 ease-out;
+    @apply placeholder:text-slate-400;
+    @apply hover:border-slate-300;
+    @apply focus:border-medical focus:bg-white focus:ring-4 focus:ring-medical/15 focus:outline-none;
+  }
+
+  /* Primary action button (teal) */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-medical-light to-medical px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-medical/25 transition duration-200 ease-out;
+    @apply hover:-translate-y-0.5 hover:from-medical hover:to-medical-dark hover:shadow-xl hover:shadow-medical/30;
+    @apply active:translate-y-0 active:shadow-md;
+    @apply focus-visible:ring-4 focus-visible:ring-medical/30 focus-visible:outline-none;
+    @apply disabled:pointer-events-none disabled:opacity-60;
+  }
+
+  /* Inline error message, e.g. below a form */
+  .alert-error {
+    @apply rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700;
+  }
+
+  /* ---------- App shell ---------- */
+
+  /* Sticky top bar: logo, navbar, user info */
+  .app-header {
+    @apply sticky top-0 z-10 flex min-h-16 flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-slate-200 bg-white/90 px-4 py-2 backdrop-blur sm:px-8;
+  }
+
+  /* Centered page content below the header */
+  .page-container {
+    @apply mx-auto w-full max-w-7xl px-4 py-8 sm:px-8;
+  }
+
+  .page-title {
+    @apply text-2xl font-semibold text-slate-900;
+  }
+
+  /* Navbar tab; the active one gets aria-current="page" */
+  .nav-link {
+    @apply flex items-center border-b-2 border-transparent px-4 text-sm font-medium text-slate-500 transition-colors duration-200;
+    @apply hover:border-slate-300 hover:text-slate-900;
+    @apply aria-[current=page]:border-medical aria-[current=page]:text-medical;
+  }
+
+  /* Small "← Back" link */
+  .link-back {
+    @apply inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-medical;
+  }
+
+  /* Square icon-only button (e.g. logout) */
+  .btn-icon {
+    @apply inline-flex size-10 items-center justify-center rounded-xl text-slate-600 transition-colors duration-200;
+    @apply hover:bg-slate-100 hover:text-slate-900;
+    @apply focus-visible:ring-4 focus-visible:ring-medical/30 focus-visible:outline-none;
+  }
+
+  /* Red hover for destructive icon buttons (e.g. logout) */
+  .btn-icon-danger {
+    @apply hover:bg-red-50 hover:text-red-600 focus-visible:ring-red-200;
+  }
+
+  /* Neutral outline button (e.g. Cancel) */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors duration-200;
+    @apply hover:bg-slate-50 hover:text-slate-900;
+    @apply focus-visible:ring-4 focus-visible:ring-slate-200 focus-visible:outline-none;
+  }
+
+  /* Red button for destructive confirmations */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-red-600/20 transition-colors duration-200;
+    @apply hover:bg-red-700;
+    @apply focus-visible:ring-4 focus-visible:ring-red-200 focus-visible:outline-none;
+    @apply disabled:pointer-events-none disabled:opacity-60;
+  }
+
+  /* ---------- Modal (<dialog>) ---------- */
+
+  .modal {
+    @apply m-auto w-[calc(100%-2rem)] max-w-sm rounded-3xl border border-slate-100 bg-white p-0 shadow-2xl;
+
+    &[open] {
+      @apply animate-fade-up motion-reduce:animate-none;
+    }
+
+    &::backdrop {
+      @apply bg-slate-900/30 backdrop-blur-sm;
+    }
+  }
+
+  /* ---------- Table ---------- */
+
+  /* Rounded, scrollable container so wide tables don't break the page */
+  .table-wrap {
+    @apply overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm;
+  }
+
+  .data-table {
+    @apply w-full border-collapse text-left text-sm whitespace-nowrap;
+
+    & th {
+      @apply border-b border-slate-200 bg-slate-50 px-5 py-4 text-xs font-semibold tracking-wide text-slate-500 uppercase;
+    }
+
+    & td {
+      @apply border-b border-slate-100 px-5 py-4 text-slate-700;
+    }
+
+    & tbody tr {
+      @apply transition-colors duration-150 hover:bg-teal-50/50;
+    }
+
+    & tbody tr:last-child td {
+      @apply border-b-0;
+    }
+  }
+
+  /* ---------- Status badge ---------- */
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+
+    &::before {
+      @apply size-1.5 rounded-full bg-current content-[''];
+    }
+  }
+
+  .badge-warning {
+    @apply bg-amber-50 text-amber-700 ring-1 ring-amber-200;
+  }
+
+  .badge-info {
+    @apply bg-sky-50 text-sky-700 ring-1 ring-sky-200;
+  }
+
+  .badge-success {
+    @apply bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200;
+  }
+
+  .badge-danger {
+    @apply bg-red-50 text-red-700 ring-1 ring-red-200;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary,
+  .field {
+    @apply transition-none hover:translate-y-0;
+  }
+}
